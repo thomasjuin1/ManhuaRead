@@ -1,0 +1,6 @@
+selenium
+python-oauth2
+fastapi
+uvicorn
+python-jose
+pymongo

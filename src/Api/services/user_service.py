@@ -2,7 +2,7 @@ from ..models.user import User, ShortUser
 from typing import List
 from json import load
 from fastapi import HTTPException
-from ..database.pymongo_users import get_user_by_id, get_user_by_email, get_all_users, create_user, update_user, delete_user
+from ..database.pymongo_users import get_user_by_id, get_user_by_email, get_all_users, create_user, update_user, delete_user, get_user_login
 
 class UserService:
 
@@ -36,27 +36,32 @@ class UserService:
         raise Exception('Unable to load the user.')
       return UserService.format_shortuser(user)
     except:
-      raise HTTPException(status_code=500, detail='Unable to load the user.')
+      raise Exception('Unable to load the user.')
 
   @staticmethod
   def get_user_by_email(email: str) -> User:
     try:
       user = get_user_by_email(email)
-      if (user == None):
-        raise Exception('Unable to load the user.')
+      new_user = UserService.format_user(user)
+      return new_user
+    except:
+      raise Exception('Unable to load the user.')
+    
+  @staticmethod
+  def get_login_user(body) -> User:
+    try:
+      user = get_user_login(body)
       return user
     except:
-      raise HTTPException(status_code=500, detail='Unable to load the user.')
+      raise Exception('Unable to load the user.')
 
   @staticmethod
   def register_user(user: User) -> User:
     try:
       new_user = create_user(user)
-      if (new_user == None):
-        raise Exception('Unable to register user.')
       return new_user
-    except:
-      raise HTTPException(status_code=500, detail='Unable to register user.')
+    except Exception as e:
+      raise Exception(str(e))
 
   @staticmethod
   def get_users_data() -> List[ShortUser]:
@@ -69,4 +74,4 @@ class UserService:
         formatted_users.append(UserService.format_shortuser(user))
       return formatted_users
     except:
-      raise HTTPException(status_code=500, detail='Unable to load the users.')
+      raise Exception('Unable to load the users.')

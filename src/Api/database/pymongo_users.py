@@ -10,8 +10,8 @@ def get_collection():
     try:
         collection_user = dbname["users"]
         return collection_user
-    except:
-        return None
+    except Exception as e:
+        raise Exception(str(e))
 
 def get_user_by_id(id):
     try:
@@ -19,24 +19,26 @@ def get_user_by_id(id):
         value : int = int(id)
         user : User = collection_user.find_one({"_id": value})
         return user
-    except:
-        return None
+    except Exception as e:
+        raise Exception(str(e))
 
 def get_user_by_email(mail):
     try:
         collection_user = get_collection()
         user = collection_user.find_one({"email": mail})
         return user
-    except:
-        return None
+    except Exception as e:
+        raise Exception(str(e))
 
 def get_user_login(login: LoginBody):
     try:
         collection_user = get_collection()
         user = collection_user.find_one({"email": login.email, "password": login.password})
+        if (user == None):
+            raise Exception("User not found.")
         return user
-    except:
-        return None
+    except Exception as e:
+        raise Exception(str(e))
 
 def get_all_users():
     try:
@@ -44,29 +46,32 @@ def get_all_users():
         user_cursor = collection_user.find()
         user_list = list(user_cursor)
         return user_list
-    except:
-        return None
+    except Exception as e:
+        raise Exception(str(e))
 
 def create_user(user: User):
     try:
         collection_user = get_collection()
+        if (collection_user.find_one({"email": user.email}) != None):
+            raise Exception('Email already registered.')
         user_dict = user.dict()
         inserted_user = collection_user.insert_one(user_dict)
-        return inserted_user
-    except:
-        return None
+        user = collection_user.find_one({"_id": inserted_user.inserted_id})
+        return user
+    except Exception as e:
+        raise Exception(str(e))
 
 def update_user(id, user: User):
     try:
         collection_user = get_collection()
         user = collection_user.update_one({"_id": id}, {"$set": user.model_dump(by_alias=True)})
-    except:
-        return None
+    except Exception as e:
+        raise Exception(str(e))
 
 def delete_user(id):
     try:
         collection_user = get_collection()
         collection_user.delete_one({"_id": id})
         return id
-    except:
-        return None
+    except Exception as e:
+        raise Exception(str(e))

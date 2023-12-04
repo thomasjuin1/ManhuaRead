@@ -13,12 +13,10 @@ router = APIRouter(prefix='/users')
 @router.post('/login')
 def login(body: LoginBody) -> LoginResponse:
   try:
-    data : User = UserService.get_user_by_email(body.email)
-
-    if body.password != data.password:
-      raise Exception('Invalid password.')
+    user = UserService.get_login_user(body)
+    new_user = UserService.format_shortuser(user)
     return LoginResponse(
-      access_token=jwt.encode(dict(data), JWT_SECRET, algorithm='HS256')
+      access_token=jwt.encode(dict(new_user), JWT_SECRET, algorithm='HS256')
     )
   except Exception as e:
     print(e)
@@ -29,11 +27,13 @@ def register(body: RegisterBody) -> RegisterResponse:
   try:
     user : User = User(body)
     user = UserService.register_user(user)
+    new_user = UserService.format_shortuser(user)
     return RegisterResponse(
-      access_token=jwt.encode(user.dict(), JWT_SECRET, algorithm='HS256')
+      access_token=jwt.encode(dict(new_user), JWT_SECRET, algorithm='HS256')
     )
-  except:
-    raise HTTPException(status_code=500, detail='Unable to register user.')
+  except (Exception) as error:
+    print(error)
+    raise HTTPException(status_code=500, detail='Unable to register the user.')
 
 @router.get('/')
 def get_user():

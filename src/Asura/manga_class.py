@@ -6,6 +6,10 @@ class Manga:
         self.status = None
         self.chapters = None
         self.note = None
+        self.link = None
+        self.image = None
+        self.synopsis = None
+        self.genres = None
 
         i = 0
 

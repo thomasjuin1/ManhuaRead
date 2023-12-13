@@ -3,7 +3,6 @@ from ..models.user import User, ShortUser
 from ..models.login import LoginBody
 import logging
 
-
 dbname = get_database()
 
 def get_collection():

@@ -46,7 +46,7 @@ class UserService:
       return new_user
     except:
       raise Exception('Unable to load the user.')
-    
+
   @staticmethod
   def get_login_user(body) -> User:
     try:

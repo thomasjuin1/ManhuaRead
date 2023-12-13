@@ -19,10 +19,10 @@ class User(BaseModel):
 
     def __str__(self):
         return "email: " + self.email + "\npassword: " + self.password + "\nusername: " + self.username + "\nis_superuser: " + str(self.is_superuser)
-    
+
     def get(self):
         return self.email, self.password, self.username, self.is_superuser
-    
+
 
 class ShortUser(BaseModel):
     id: str = "1"
@@ -37,4 +37,3 @@ class ShortUser(BaseModel):
 
     def get(self):
         return self.id, self.email, self.username
-

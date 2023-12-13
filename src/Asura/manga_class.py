@@ -1,6 +1,6 @@
 
 class Manga:
-    def __init__(self, infos):
+    def __init__(self):
         self.title = None
         self.type = None
         self.status = None
@@ -11,36 +11,16 @@ class Manga:
         self.synopsis = None
         self.genres = None
 
-        i = 0
-
-        if (infos[i] == "DROPPED"):
-            self.status = "DROPPED"
-            i = i + 1
-        elif (infos[i] == "COMPLETED"):
-            self.status = "COMPLETED"
-            i = i + 1
-        else:
-            self.status = "ONGOING"
-
-        if (i < len(infos) and infos[i]):
-            self.type = infos[i]
-            i = i + 1
-        if (i < len(infos) and infos[i]):
-            self.title = infos[i]
-            i = i + 1
-        if (i < len(infos) and infos[i]):
-            self.chapters = infos[i].split(" ")[1]
-            i = i + 1
-        if (i < len(infos) and infos[i]):
-            self.note = infos[i]
-
-        for (key, val) in self.__dict__.items():
-            if (val == None):
-                self.__dict__[key] = "N/A"
-
     def __str__(self):
         value = ""
         for (key, val) in self.__dict__.items():
+            if (val.__class__ == list):
+                value = value + key + ": "
+                for genre in val:
+                    value = value + genre
+                    if (genre != val[-1]):
+                        value = value + ", "
+                continue
             if (val):
                 value = value + key + ": "+val+"\n"
         return value

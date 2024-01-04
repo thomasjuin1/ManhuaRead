@@ -2,6 +2,15 @@ from pydantic import BaseModel
 from ...Asura.manga_class import Manga
 
 class Manga(BaseModel):
+    title : str = None
+    type : str = None
+    status : str = None
+    chapters : str = None
+    note : str = None
+    link : str = None
+    image : str = None
+    synopsis : str = None
+    genres : list = None
 
     def __init__(self):
         super().__init__()
@@ -14,18 +23,6 @@ class Manga(BaseModel):
         self.image = None
         self.synopsis = None
         self.genres = None
-
-    def __init__(self, manga : Manga):
-        super().__init__()
-        self.title = manga.title
-        self.type = manga.type
-        self.status = manga.status
-        self.chapters = manga.chapters
-        self.note = manga.note
-        self.link = manga.link
-        self.image = manga.image
-        self.synopsis = manga.synopsis
-        self.genres = manga.genres
 
     def __str__(self):
         value = ""
@@ -42,9 +39,16 @@ class Manga(BaseModel):
         return value
 
 class MangaDb(BaseModel):
-
-    def __init__(self, manga : Manga):
-        self.manga : Manga = manga
+    title : str = None
+    type : str = None
+    status : str = None
+    chapters : str = None
+    note : str = None
+    link : str = None
+    image : str = None
+    synopsis : str = None
+    genres : list = None
+    id : str = None
 
     def __str__(self):
         value = ""
@@ -52,6 +56,32 @@ class MangaDb(BaseModel):
             if (val):
                 value = value + key + ": "+str(val)+"\n"
         return value
+
+    def to_manga(self):
+        manga : Manga = Manga()
+        manga.title = self.title
+        manga.type = self.type
+        manga.status = self.status
+        manga.chapters = self.chapters
+        manga.note = self.note
+        manga.link = self.link
+        manga.image = self.image
+        manga.synopsis = self.synopsis
+        manga.genres = self.genres
+        return manga
+
+    def manga_from_db(self, manga):
+        self.id = str(manga["_id"])
+        self.title = manga["title"]
+        self.type = manga["type"]
+        self.status = manga["status"]
+        self.chapters = manga["chapters"]
+        self.note = manga["note"]
+        self.link = manga["link"]
+        self.image = manga["image"]
+        self.synopsis = manga["synopsis"]
+        self.genres = manga["genres"]
+        print(self)
 
 class MangaUserDb(BaseModel):
 

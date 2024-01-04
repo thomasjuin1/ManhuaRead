@@ -1,21 +1,23 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
-#from ..Api.models.manga import Manga, MangaDb, MangaUserDb
-#from ..Api.database.pymongo_manga import insert_manga, update_manga
-from manga_class import Manga
+from src.Api.models.manga import Manga, MangaDb, MangaUserDb
+from src.Api.database.pymongo_manga import insert_manga, update_manga
+from chromedriver_py import binary_path
 import threading
 
 FinalMangaList = []
 Lock = threading.Lock()
 
-def AsuraScraper():
+def AsuraScraper(headless : bool = True):
     # Initialize ChromeOptions and set headless mode
     chrome_options = Options()
-    chrome_options.add_argument('--headless')
-
+    if (headless == True):
+        chrome_options.add_argument('--headless')
+        
     # Initialize the web driver with the options
-    driver = webdriver.Chrome(options=chrome_options)  # Use other drivers similarly
+    svc = webdriver.ChromeService(binary_path)
+    driver = webdriver.Chrome(service=svc, options=chrome_options)
 
     # Navigate to the website
     try:
@@ -48,7 +50,7 @@ def AsuraScraper():
     MangaList = AsuraMangaScraper(MangaList)
     for manga in MangaList:
         print(manga.title)
-        #update_manga(manga)
+        insert_manga(manga)
     return MangaList
 
 def AsuraMangaScraper(MangaList):
@@ -85,10 +87,11 @@ def AsuraThreadScraper(url):
 
     # Initialize ChromeOptions and set headless mode
     chrome_options = Options()
-    #chrome_options.add_argument('--headless')
+    chrome_options.add_argument('--headless')
 
     # Initialize the web driver with the options
-    driver = webdriver.Chrome(options=chrome_options)  # Use other drivers similarly
+    svc = webdriver.ChromeService(binary_path)
+    driver = webdriver.Chrome(service=svc, options=chrome_options)
 
     # Navigate to the website
     try:
@@ -171,4 +174,4 @@ def AsuraThreadScraper(url):
     Lock.release()
     return manga
 
-AsuraScraper()
+#AsuraScraper()

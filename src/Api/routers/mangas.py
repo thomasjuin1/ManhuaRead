@@ -12,22 +12,17 @@ JWT_SECRET: str = ('JWT_SECRET')
 router = APIRouter(prefix='/mangas')
 
 @router.get('/')
-def get_manga():
+async def get_manga():
   try:
-    return MangaService.get_manga_data()
+    mangas = await MangaService.get_manga_data()
+    return mangas
   except:
     raise HTTPException(status_code=500, detail='Unable to load mangas data.')
 
 @router.get('/{id}')
-def get_manga_by_id(id: str):
+async def get_manga_by_id(id: str):
   try:
-    return MangaService.get_manga_by_id(id)
+    manga = await MangaService.get_manga_by_id(id)
+    return manga
   except:
     raise HTTPException(status_code=500, detail='Unable to load manga data.')
-
-@router.post('/start_polling')
-def start_polling():
-  try:
-    return MangaService.start_polling()
-  except:
-    raise HTTPException(status_code=500, detail='Unable to start polling.')

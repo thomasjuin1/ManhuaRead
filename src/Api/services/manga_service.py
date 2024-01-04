@@ -4,9 +4,7 @@ from json import load
 from fastapi import HTTPException
 from ..database.pymongo_users import get_user_by_id, get_user_by_email
 from ..database.pymongo_manga import get_manga_by_id, get_all_manga, insert_manga, update_manga
-from ...Asura.asura_manga_scraper import AsuraScraper
-import asyncio
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from ..models.manga import Manga, MangaDb
 
 class MangaService:
 
@@ -14,37 +12,23 @@ class MangaService:
     async def get_manga_data():
         try:
             manga_list = get_all_manga()
-            return manga_list
+
+            manga_list_db = []
+            for manga in manga_list:
+                manga_db : MangaDb = MangaDb()
+                manga_db.manga_from_db(manga)
+                manga_list_db.append(manga_db)
+            return manga_list_db
         except Exception as e:
             raise Exception('Unable to load the asura mangas:', str(e))
-
+        
     @staticmethod
-    async def start_polling():
+    async def get_manga_by_id(id: str):
         try:
-            """
-            scheduler = AsyncIOScheduler()  # Create a scheduler instance
-
-            # Add a job to the scheduler that runs the scraper every 2 hours
-            scheduler.add_job(MangaService.run_scraper, 'interval', hours=2)
-
-            scheduler.start()  # Start the scheduler
-            asyncio.get_event_loop().run_forever()  # Run the event loop continuously
-            """
-            print("Scheduler started successfully.")
-            return await AsuraScraper()
-
+            print("Get manga by id")
+            manga = get_manga_by_id(id)
+            manga_db : MangaDb = MangaDb()
+            manga_db.manga_from_db(manga)
+            return manga_db
         except Exception as e:
-            raise Exception('Unable to start polling:', str(e))
-
-    @staticmethod
-    async def run_scraper():
-        try:
-            manga_list = await MangaService.get_asura_mangas()
-            print("Manga list updated:", manga_list)
-        except Exception as e:
-            print('Error in scraper:', str(e))
-"""
-# Add this block to execute the periodic task
-if __name__ == "__main__":
-    MangaService.start_polling()
-"""
+            raise Exception('Unable to load the asura manga:', str(e))

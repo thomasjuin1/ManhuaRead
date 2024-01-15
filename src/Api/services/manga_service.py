@@ -25,7 +25,6 @@ class MangaService:
     @staticmethod
     async def get_manga_by_id(id: str):
         try:
-            print("Get manga by id")
             manga = get_manga_by_id(id)
             manga_db : MangaDb = MangaDb()
             manga_db.manga_from_db(manga)

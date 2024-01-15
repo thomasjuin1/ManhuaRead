@@ -2,12 +2,14 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from src.Api.models.manga import Manga, MangaDb, MangaUserDb
-from src.Api.database.pymongo_manga import insert_manga, update_manga
+from src.Api.database.pymongo_database import get_database
 from chromedriver_py import binary_path
 import threading
 
+dbname = get_database(False)
 FinalMangaList = []
 Lock = threading.Lock()
+
 
 def AsuraScraper(headless : bool = True):
     # Initialize ChromeOptions and set headless mode
@@ -41,16 +43,15 @@ def AsuraScraper(headless : bool = True):
             MangaList[i].link = href_value
             i = i + 1
         try:
-            break
             button[0].click()
         except:
-            print("Error: Unable to click on the button")
+            print("Unable to click on the button, this is the last page.")
             last_page = True
     driver.quit()
     MangaList = AsuraMangaScraper(MangaList)
     for manga in MangaList:
         print(manga.title)
-        insert_manga(manga)
+        update_manga(manga)
     return MangaList
 
 def AsuraMangaScraper(MangaList):
@@ -58,7 +59,8 @@ def AsuraMangaScraper(MangaList):
     try:
         i = 0
         max_i = len(MangaList)
-        max_threads = 10
+        print("Number of mangas to scrape:", max_i)
+        max_threads = 20
         threads = []
 
         while (i < max_i):
@@ -71,7 +73,6 @@ def AsuraMangaScraper(MangaList):
                 for thread in threads:
                     thread.join()
                     threads.remove(thread)
-
         for thread in threads:
             thread.join()
             threads.remove(thread)
@@ -92,13 +93,15 @@ def AsuraThreadScraper(url):
     # Initialize the web driver with the options
     svc = webdriver.ChromeService(binary_path)
     driver = webdriver.Chrome(service=svc, options=chrome_options)
+    # Add a timeout
+    driver.set_page_load_timeout(10)
 
     # Navigate to the website
     try:
         driver.get(url)
     except Exception as e:
         print("Error: Unable to connect to the website:", str(e))
-        exit(84)
+        return None
 
     manga.link = url
 
@@ -172,6 +175,22 @@ def AsuraThreadScraper(url):
     Lock.acquire()
     FinalMangaList.append(manga)
     Lock.release()
+    print("Scraped:", manga.title)
     return manga
 
-#AsuraScraper()
+def get_collection():
+    try:
+        collection_manga = dbname["manga"]
+        return collection_manga
+    except Exception as e:
+        raise Exception(str(e))
+
+def update_manga(manga: Manga):
+    try:
+        collection_manga = get_collection()
+        manga_dict = manga.dict()
+        collection_manga.update_one({"title": manga.title}, {"$set": manga_dict}, upsert=True)
+        manga = collection_manga.find_one({"title": manga.title})
+        return manga
+    except Exception as e:
+        raise Exception(str(e))

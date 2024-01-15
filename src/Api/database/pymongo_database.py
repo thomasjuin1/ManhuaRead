@@ -3,9 +3,12 @@ import os
 from os import environ as env
 import logging
 
-def get_database():
+def get_database(isApi = True):
 
-   CONNECTION_STRING = ('mongodb://root:password@mongo:27017/?authMechanism=DEFAULT')
+   if (isApi):
+      CONNECTION_STRING = ('mongodb://root:password@mongo:27017/?authMechanism=DEFAULT')
+   else:
+      CONNECTION_STRING = ('mongodb://root:password@localhost:27017/?authMechanism=DEFAULT')
    # Create a connection using MongoClient. You can import MongoClient or use pymongo.MongoClient
    if (CONNECTION_STRING == None):
       print("No connection string")

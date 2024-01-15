@@ -4,6 +4,8 @@ from ..models.login import LoginBody
 import logging
 
 dbname = get_database()
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 def get_collection():
     try:
@@ -14,6 +16,7 @@ def get_collection():
 
 def get_user_by_id(id):
     try:
+        logger.info("In database/pymongo_users.py/get_user_by_id()")
         collection_user = get_collection()
         value : int = int(id)
         user : User = collection_user.find_one({"_id": value})
@@ -23,6 +26,7 @@ def get_user_by_id(id):
 
 def get_user_by_email(mail):
     try:
+        logger.info("In database/pymongo_users.py/get_user_by_email()")
         collection_user = get_collection()
         user = collection_user.find_one({"email": mail})
         return user
@@ -31,6 +35,7 @@ def get_user_by_email(mail):
 
 def get_user_login(login: LoginBody):
     try:
+        logger.info("In database/pymongo_users.py/get_user_login()")
         collection_user = get_collection()
         user = collection_user.find_one({"email": login.email, "password": login.password})
         if (user == None):
@@ -41,6 +46,7 @@ def get_user_login(login: LoginBody):
 
 def get_all_users():
     try:
+        logger.info("In database/pymongo_users.py/get_all_users()")
         collection_user = get_collection()
         user_cursor = collection_user.find()
         user_list = list(user_cursor)
@@ -50,6 +56,7 @@ def get_all_users():
 
 def create_user(user: User):
     try:
+        logger.info("In database/pymongo_users.py/create_user()")
         collection_user = get_collection()
         if (collection_user.find_one({"email": user.email}) != None):
             raise Exception('Email already registered.')
@@ -62,13 +69,16 @@ def create_user(user: User):
 
 def update_user(id, user: User):
     try:
+        logger.info("In database/pymongo_users.py/update_user()")
         collection_user = get_collection()
-        user = collection_user.update_one({"_id": id}, {"$set": user.model_dump(by_alias=True)})
+        user_dict = user.dict()
+        user = collection_user.update_one({"_id": id}, {"$set": user_dict}, upsert=True)
     except Exception as e:
         raise Exception(str(e))
 
 def delete_user(id):
     try:
+        logger.info("In database/pymongo_users.py/delete_user()")
         collection_user = get_collection()
         collection_user.delete_one({"_id": id})
         return id

@@ -82,10 +82,11 @@ class MangaDb(BaseModel):
         self.synopsis = manga["synopsis"]
         self.genres = manga["genres"]
         print(self)
-
+    
 class MangaUserDb(BaseModel):
 
     def __init__(self):
+        self.user_id = None
         self.manga_id = None
         self.is_favorite : bool = False
         self.is_read : bool = False
@@ -99,4 +100,10 @@ class MangaUserDb(BaseModel):
                 value = value + key + ": "+str(val)+"\n"
         return value
 
-
+class MangaParams(BaseModel):
+    
+    def __init__(self):
+        self.is_favorite : bool = False
+        self.is_read : bool = False
+        self.is_reading : bool = False
+        self.is_to_read : bool = False

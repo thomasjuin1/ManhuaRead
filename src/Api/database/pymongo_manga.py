@@ -1,8 +1,6 @@
 from bson import ObjectId
 from .pymongo_database import get_database
-from ..models.user import User, ShortUser
 from ..models.manga import Manga
-from ..models.login import LoginBody
 import logging
 
 from src.Api.models import manga
@@ -20,6 +18,7 @@ def get_collection():
 
 def get_manga_by_id(id):
     try:
+        logger.info("In database/pymongo_manga.py/get_manga_by_id()")
         collection_manga = get_collection()
         objId : ObjectId = ObjectId(id)
         manga = collection_manga.find_one({"_id": objId})
@@ -43,6 +42,7 @@ def get_all_manga():
 
 def insert_manga(manga: Manga):
     try:
+        logger.info("In database/pymongo_manga.py/insert_manga()")
         collection_manga = get_collection()
         manga_dict = manga.dict()
         inserted_manga = collection_manga.insert_one(manga_dict)
@@ -53,6 +53,7 @@ def insert_manga(manga: Manga):
 
 def update_manga(manga: Manga):
     try:
+        logger.info("In database/pymongo_manga.py/update_manga()")
         collection_manga = get_collection()
         manga_dict = manga.dict()
         collection_manga.update_one({"title": manga.title}, {"$set": manga_dict}, upsert=True)

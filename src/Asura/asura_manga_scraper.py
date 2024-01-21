@@ -48,13 +48,13 @@ def AsuraScraper(headless : bool = True):
             print("Unable to click on the button, this is the last page.")
             last_page = True
     driver.quit()
-    MangaList = AsuraMangaScraper(MangaList)
+    MangaList = AsuraMangaScraper(MangaList, headless)
     for manga in MangaList:
         print(manga.title)
         update_manga(manga)
     return MangaList
 
-def AsuraMangaScraper(MangaList):
+def AsuraMangaScraper(MangaList, headless : bool = True):
 
     try:
         i = 0
@@ -65,7 +65,7 @@ def AsuraMangaScraper(MangaList):
 
         while (i < max_i):
             if (len(threads) < max_threads):
-                thread = threading.Thread(target=AsuraThreadScraper, args=(MangaList[i].link,))
+                thread = threading.Thread(target=AsuraThreadScraper, args=(MangaList[i].link, headless))
                 thread.start()
                 threads.append(thread)
                 i = i + 1
@@ -83,12 +83,13 @@ def AsuraMangaScraper(MangaList):
     # Close the web driver
     return FinalMangaList
 
-def AsuraThreadScraper(url):
+def AsuraThreadScraper(url, headless : bool = True):
     manga : Manga = Manga()
 
     # Initialize ChromeOptions and set headless mode
     chrome_options = Options()
-    chrome_options.add_argument('--headless')
+    if (headless == True):
+        chrome_options.add_argument('--headless')
 
     # Initialize the web driver with the options
     svc = webdriver.ChromeService(binary_path)

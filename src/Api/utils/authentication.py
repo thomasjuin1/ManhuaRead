@@ -2,13 +2,14 @@ from fastapi import Request
 from jose import jwt
 from os import environ as env
 
-JWT_SECRET: str = env.get('JWT_SECRET')
+JWT_SECRET: str = ('JWT_SECRET')
 
 class AuthenticationUtils:
   @staticmethod
   def extract_id(req: Request) -> int:
-    authorization = req.headers.get('Authorization', None)
+    authorization = req.headers.get('authorization', None)
 
+    print(authorization)
     if authorization is None:
       return None
 

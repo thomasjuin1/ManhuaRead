@@ -1,3 +1,4 @@
+from bson import ObjectId
 from .pymongo_database import get_database
 from ..models.user import User, ShortUser
 from ..models.login import LoginBody
@@ -18,7 +19,7 @@ def get_user_by_id(id):
     try:
         logger.info("In database/pymongo_users.py/get_user_by_id()")
         collection_user = get_collection()
-        value : int = int(id)
+        value : ObjectId = ObjectId(id)
         user : User = collection_user.find_one({"_id": value})
         return user
     except Exception as e:
